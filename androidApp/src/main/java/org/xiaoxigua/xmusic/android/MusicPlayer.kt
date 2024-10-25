@@ -1,7 +1,9 @@
 package org.xiaoxigua.xmusic.android
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -53,13 +55,13 @@ fun OpenFolderScreen() {
     val current = remember { mutableIntStateOf(0) }
     val musicPlayer = MusicPlayer(context, current.intValue)
 
-    // 通过 rememberLauncherForActivityResult 创建一个 launcher 用于启动文件夹选择器
+    // Create a launcher using rememberLauncherForActivityResult to launch a file selector.
     val folderPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { uri: Uri? ->
         selectedFolderUri = uri
         if (uri != null) {
-            // get folder read permission
+            // Request folder read access.
             context.contentResolver.takePersistableUriPermission(
                 uri,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -76,7 +78,7 @@ fun OpenFolderScreen() {
         val folder = DocumentFile.fromTreeUri(context, uri)
 
         folder?.listFiles()?.forEach { file ->
-            if (file != null && file.name?.endsWith(".flac") == true) {
+            if (file != null && file.isFile) {
                 musicPlayer.mediaList.addMedia(file.uri)
             }
         }
@@ -89,6 +91,7 @@ fun OpenFolderScreen() {
 @Composable
 fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
     val currentMetas = musicPlayer.currentMeta()
+    val context = LocalContext.current
     var progress by remember { mutableStateOf(musicPlayer.getProgress()) }
     var isPlaying by remember { mutableStateOf(musicPlayer.vlcPlayer.isPlaying) }
 
@@ -109,8 +112,8 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (currentMetas != null) {
-                Text(text = currentMetas.title ?: "???", fontSize = 24.sp)
-                Text(text = currentMetas.artist ?: "???", fontSize = 12.sp)
+                Text(text = currentMetas.title ?: getFileName(context, musicPlayer.getCurrentUri() as Uri)!!, fontSize = 24.sp)
+                Text(text = currentMetas.artist ?: "Unknown Artist", fontSize = 12.sp)
 
                 Box(modifier = Modifier.padding(50.dp, 20.dp)) {
                     VinylAlbumCoverAnimation(isPlaying, currentMetas.artworkURL)
@@ -182,6 +185,29 @@ fun formatDuration(milliseconds: Long): String {
     val seconds = totalSeconds % 60
 
     return String.format(Locale.US, "%02d:%02d", minutes, seconds)
+}
+
+fun getFileName(context: Context, uri: Uri): String? {
+    var fileName: String? = null
+    // 使用 ContentResolver 查詢 URI
+    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            // 查找檔案名稱的欄位 (通常是 OpenableColumns.DISPLAY_NAME)
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1) {
+                fileName = cursor.getString(nameIndex)
+            }
+        }
+    }
+
+    if (fileName != null) {
+        // 去掉副檔名
+        val dotIndex = fileName!!.lastIndexOf('.')
+        if (dotIndex != -1) {
+            fileName = fileName!!.substring(0, dotIndex)
+        }
+    }
+    return fileName
 }
 
 @Composable

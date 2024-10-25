@@ -1,5 +1,6 @@
 package org.xiaoxigua.xmusic
 
+import android.content.res.AssetFileDescriptor
 import android.net.Uri
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
@@ -13,15 +14,36 @@ class AndroidPlatformMediaList : PlatformMediaList {
         libVLC = libVlc
     }
 
+    private fun getFdFromUri(uri: Uri): AssetFileDescriptor? {
+        return (libVLC as LibVLC).appContext.contentResolver.openAssetFileDescriptor(
+            uri,
+            "r"
+        )
+    }
+
+    private fun checkFileFormat(fd: AssetFileDescriptor?): Boolean {
+        val media = Media(libVLC as LibVLC, fd)
+
+        media.parse()
+
+        val isSupported = media.tracks.isNotEmpty()
+
+        media.release()
+        fd?.close()
+
+        return isSupported
+    }
+
     override fun addMedia(uri: Any) {
-        mediaList.add(uri as Uri)
+        val fd = getFdFromUri(uri as Uri)
+
+        if (checkFileFormat(fd)) {
+            mediaList.add(uri)
+        }
     }
 
     override fun getMedia(index: Int): MediaData {
-        val fd = (libVLC as LibVLC).appContext.contentResolver.openAssetFileDescriptor(
-            mediaList[index],
-            "r"
-        )
+        val fd = getFdFromUri(mediaList[index])
 
         return MediaData(Media(libVLC as LibVLC, fd), fd)
     }
@@ -36,7 +58,7 @@ class AndroidPlatformMediaList : PlatformMediaList {
 
     override fun getMediaMetas(): List<AudioMeta> {
         return mediaList.map { uri ->
-            val fd = (libVLC as LibVLC).appContext.contentResolver.openAssetFileDescriptor(uri, "r")
+            val fd = getFdFromUri(uri)
             val media = Media(libVLC as LibVLC, fd)
 
             media.parse()
@@ -49,7 +71,7 @@ class AndroidPlatformMediaList : PlatformMediaList {
             media.release()
             fd?.close()
 
-            AudioMeta(title, artist, album, artworkURL)
+            AudioMeta(if (title == "imem://") null else title, artist, album, artworkURL)
         }
     }
 

@@ -16,6 +16,8 @@ class MusicPlayer(context: Any, private var current: Int = 0) {
         vlcPlayer.setMedia(mediaList.getMedia(current))
     }
 
+    fun getCurrentUri() = mediaList.mediaList[current]
+
     fun getProgress(): Progress = vlcPlayer.getProgress()
 
     fun currentMeta(): AudioMeta? = mediaList.getMediaMetas().getOrNull(current)
