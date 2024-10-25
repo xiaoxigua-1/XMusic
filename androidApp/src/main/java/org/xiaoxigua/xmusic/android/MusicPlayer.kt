@@ -129,7 +129,8 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
                         progress = Progress((progress.length * it).toLong(), it, progress.length)
                     }, onValueChangeFinished = {
                         musicPlayer.vlcPlayer.setPosition(progress.pos)
-                        musicPlayer.vlcPlayer.play()
+                        if (isPlaying)
+                            musicPlayer.vlcPlayer.play()
                     }, valueRange = 0f..1f, colors = SliderDefaults.colors(
                         thumbColor = Color.Black,
                         activeTrackColor = Color.DarkGray,
@@ -159,6 +160,7 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
                     ControlButton(Icons.Sharp.SkipPrevious, 64.dp) {
                         musicPlayer.prev()
                         musicPlayer.vlcPlayer.play()
+                        isPlaying = true
                     }
                     ControlButton(
                         if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
@@ -172,6 +174,7 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
                     ControlButton(Icons.Sharp.SkipNext, 64.dp) {
                         musicPlayer.next()
                         musicPlayer.vlcPlayer.play()
+                        isPlaying = true
                     }
                 }
             }
