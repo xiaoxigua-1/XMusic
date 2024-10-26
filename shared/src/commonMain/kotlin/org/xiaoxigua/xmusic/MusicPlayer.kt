@@ -1,6 +1,6 @@
 package org.xiaoxigua.xmusic
 
-class MusicPlayer(context: Any, private var current: Int = 0) {
+class MusicPlayer(context: Any) {
     private val platformLibVLC: PlatformLibVLC = getPlatformLibVLC()
     val vlcPlayer: PlatformVLCPlayer = getPlatformVLCPlayer()
     val mediaList: PlatformMediaList = getPlatformMediaList()
@@ -12,33 +12,37 @@ class MusicPlayer(context: Any, private var current: Int = 0) {
         mediaList.init(libVLC)
     }
 
-    fun setCurrentMedia() {
-        vlcPlayer.setMedia(mediaList.getMedia(current))
+    fun setMedia(index: Int) {
+        vlcPlayer.setMedia(mediaList.getMedia(index))
     }
 
-    fun getCurrentUri() = mediaList.mediaList[current]
+    fun getUri(index: Int) = mediaList.mediaList[index]
 
     fun getProgress(): Progress = vlcPlayer.getProgress()
 
-    fun currentMeta(): AudioMeta? = mediaList.getMediaMetas().getOrNull(current)
+    fun getMeta(index: Int): AudioMeta? = mediaList.getMediaMetas().getOrNull(index)
 
-    fun next() {
-        if (current + 1 < mediaList.getLength()) {
-            current++
+    fun next(index: Int): Int {
+        val ret = if (index + 1 < mediaList.getLength()) {
+            index + 1
         } else {
-            current = 0
+            0
         }
 
-        setCurrentMedia()
+        setMedia(ret)
+
+        return ret
     }
 
-    fun prev() {
-        if (current - 1 > 0) {
-            current--
+    fun prev(index: Int): Int {
+        val ret = if (index - 1 > 0) {
+            index - 1
         } else {
-            current = mediaList.getLength() - 1
+            mediaList.getLength() - 1
         }
 
-        setCurrentMedia()
+        setMedia(ret)
+
+        return ret
     }
 }

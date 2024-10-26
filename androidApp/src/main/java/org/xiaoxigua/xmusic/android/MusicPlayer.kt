@@ -28,6 +28,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,8 +53,7 @@ import java.util.Locale
 fun OpenFolderScreen() {
     var selectedFolderUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
-    val current = remember { mutableIntStateOf(0) }
-    val musicPlayer = MusicPlayer(context, current.intValue)
+    val musicPlayer = MusicPlayer(context)
 
     // Create a launcher using rememberLauncherForActivityResult to launch a file selector.
     val folderPickerLauncher = rememberLauncherForActivityResult(
@@ -71,7 +71,8 @@ fun OpenFolderScreen() {
 
     // on ui loaded
     LaunchedEffect(Unit) {
-        folderPickerLauncher.launch(null)
+        if (selectedFolderUri == null)
+            folderPickerLauncher.launch(null)
     }
 
     selectedFolderUri?.let { uri ->
@@ -82,7 +83,7 @@ fun OpenFolderScreen() {
                 musicPlayer.mediaList.addMedia(file.uri)
             }
         }
-        musicPlayer.setCurrentMedia()
+        musicPlayer.setMedia(0)
         musicPlayer.vlcPlayer.play()
         MusicPlayerScreen(musicPlayer)
     }
@@ -90,17 +91,18 @@ fun OpenFolderScreen() {
 
 @Composable
 fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
-    val currentMetas = musicPlayer.currentMeta()
+    var current by remember { mutableIntStateOf(0) }
+    val currentMetas = musicPlayer.getMeta(current)
     val context = LocalContext.current
-    var progress by remember { mutableStateOf(musicPlayer.getProgress()) }
+    val progress = remember { mutableStateOf(musicPlayer.getProgress()) }
     var isPlaying by remember { mutableStateOf(musicPlayer.vlcPlayer.isPlaying) }
 
     musicPlayer.vlcPlayer.setUpdate({ data ->
         if (data.pos < 1f && data.pos > 0.001f) {
-            progress = data
+            progress.value = data
         }
     }, {
-        musicPlayer.next()
+        current = musicPlayer.next(current)
         musicPlayer.vlcPlayer.play()
     })
 
@@ -112,53 +114,26 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (currentMetas != null) {
-                Text(text = currentMetas.title ?: getFileName(context, musicPlayer.getCurrentUri() as Uri)!!, fontSize = 24.sp)
+                Text(
+                    text = currentMetas.title ?: getFileName(
+                        context,
+                        musicPlayer.getUri(current) as Uri
+                    )!!, fontSize = 24.sp
+                )
                 Text(text = currentMetas.artist ?: "Unknown Artist", fontSize = 12.sp)
 
                 Box(modifier = Modifier.padding(50.dp, 20.dp)) {
                     VinylAlbumCoverAnimation(isPlaying, currentMetas.artworkURL)
                 }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp)
-                ) {
-                    Slider(progress.pos, onValueChange = {
-                        musicPlayer.vlcPlayer.pause()
-                        progress = Progress((progress.length * it).toLong(), it, progress.length)
-                    }, onValueChangeFinished = {
-                        musicPlayer.vlcPlayer.setPosition(progress.pos)
-                        if (isPlaying)
-                            musicPlayer.vlcPlayer.play()
-                    }, valueRange = 0f..1f, colors = SliderDefaults.colors(
-                        thumbColor = Color.Black,
-                        activeTrackColor = Color.DarkGray,
-                        inactiveTrackColor = Color.Gray,
-                    ), modifier = Modifier.height(1.dp)
-                    )
-
-                    Row {
-                        Text(
-                            text = formatDuration(progress.time),
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(8.dp)
-                        )
-
-                        Text(
-                            text = formatDuration(progress.length),
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    }
-                }
+                ProgressSlider(progress, isPlaying, musicPlayer)
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ControlButton(Icons.Sharp.SkipPrevious, 64.dp) {
-                        musicPlayer.prev()
+                        current = musicPlayer.prev(current)
                         musicPlayer.vlcPlayer.play()
                         isPlaying = true
                     }
@@ -172,12 +147,50 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
                         } else musicPlayer.vlcPlayer.pause()
                     }
                     ControlButton(Icons.Sharp.SkipNext, 64.dp) {
-                        musicPlayer.next()
+                        current = musicPlayer.next(current)
                         musicPlayer.vlcPlayer.play()
                         isPlaying = true
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ProgressSlider(progress: MutableState<Progress>, isPlaying: Boolean, musicPlayer: MusicPlayer) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp)
+    ) {
+        Slider(progress.value.pos, onValueChange = {
+            musicPlayer.vlcPlayer.pause()
+            progress.value =
+                Progress((progress.value.length * it).toLong(), it, progress.value.length)
+        }, onValueChangeFinished = {
+            musicPlayer.vlcPlayer.setPosition(progress.value.pos)
+            if (isPlaying)
+                musicPlayer.vlcPlayer.play()
+        }, valueRange = 0f..1f, colors = SliderDefaults.colors(
+            thumbColor = Color.Black,
+            activeTrackColor = Color.DarkGray,
+            inactiveTrackColor = Color.Gray,
+        ), modifier = Modifier.height(1.dp)
+        )
+
+        Row {
+            Text(
+                text = formatDuration(progress.value.time),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp)
+            )
+
+            Text(
+                text = formatDuration(progress.value.length),
+                modifier = Modifier.padding(8.dp)
+            )
         }
     }
 }
