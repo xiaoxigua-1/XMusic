@@ -22,16 +22,16 @@ class AndroidPlatformMediaList : PlatformMediaList {
     }
 
     private fun checkFileFormat(fd: AssetFileDescriptor?): Boolean {
-        val media = Media(libVLC as LibVLC, fd)
+        val media: Media? = Media(libVLC as LibVLC, fd)
 
-        media.parse()
+        media?.parse()
 
-        val isSupported = media.tracks.isNotEmpty()
+        val isSupported = media?.tracks?.isNotEmpty()
 
-        media.release()
+        media?.release()
         fd?.close()
 
-        return isSupported
+        return isSupported == true
     }
 
     override fun addMedia(uri: Any) {
