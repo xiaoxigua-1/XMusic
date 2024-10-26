@@ -91,11 +91,11 @@ fun OpenFolderScreen() {
 
 @Composable
 fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
-    var current by remember { mutableIntStateOf(0) }
-    val currentMetas = musicPlayer.getMeta(current)
     val context = LocalContext.current
+    var current by remember { mutableIntStateOf(0) }
     val progress = remember { mutableStateOf(musicPlayer.getProgress()) }
     var isPlaying by remember { mutableStateOf(musicPlayer.vlcPlayer.isPlaying) }
+    val currentMetas = musicPlayer.getMeta(current)
 
     musicPlayer.vlcPlayer.setUpdate({ data ->
         if (data.pos < 1f && data.pos > 0.001f) {
@@ -105,6 +105,10 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
         current = musicPlayer.next(current)
         musicPlayer.vlcPlayer.play()
     })
+
+    LaunchedEffect(current) {
+        progress.value = musicPlayer.getProgress()
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -139,7 +143,7 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
                     }
                     ControlButton(
                         if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                        84.dp
+                        86.dp
                     ) {
                         isPlaying = !isPlaying
                         if (isPlaying) {

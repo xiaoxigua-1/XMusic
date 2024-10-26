@@ -39,7 +39,7 @@ interface PlatformMediaList {
 
     fun clear()
 
-    fun getMediaMetas(): List<AudioMeta>
+    fun getMediaMetas(index: Int): AudioMeta?
 
     fun getLength(): Int
 }

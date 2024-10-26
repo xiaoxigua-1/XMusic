@@ -56,8 +56,8 @@ class AndroidPlatformMediaList : PlatformMediaList {
         mediaList.clear()
     }
 
-    override fun getMediaMetas(): List<AudioMeta> {
-        return mediaList.map { uri ->
+    override fun getMediaMetas(index: Int): AudioMeta? {
+        return mediaList.getOrNull(index)?.let { uri ->
             val fd = getFdFromUri(uri)
             val media = Media(libVLC as LibVLC, fd)
 

@@ -20,7 +20,7 @@ class MusicPlayer(context: Any) {
 
     fun getProgress(): Progress = vlcPlayer.getProgress()
 
-    fun getMeta(index: Int): AudioMeta? = mediaList.getMediaMetas().getOrNull(index)
+    fun getMeta(index: Int): AudioMeta? = mediaList.getMediaMetas(index)
 
     fun next(index: Int): Int {
         val ret = if (index + 1 < mediaList.getLength()) {
