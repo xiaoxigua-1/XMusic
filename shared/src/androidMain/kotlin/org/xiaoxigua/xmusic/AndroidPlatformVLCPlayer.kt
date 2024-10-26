@@ -28,16 +28,22 @@ class AndroidPlatformVLCPlayer : PlatformVLCPlayer {
         this.media = media
     }
 
-    override fun play() {
-        mediaPlayer.play()
+    override fun play(): Boolean {
+        return mediaPlayer.media?.let {
+            mediaPlayer.play()
+        } != null
     }
 
-    override fun stop() {
+    override fun stop(): Boolean {
         mediaPlayer.stop()
+
+        return true
     }
 
-    override fun pause() {
+    override fun pause(): Boolean {
         mediaPlayer.pause()
+
+        return true
     }
 
     override fun setPosition(pos: Float) {

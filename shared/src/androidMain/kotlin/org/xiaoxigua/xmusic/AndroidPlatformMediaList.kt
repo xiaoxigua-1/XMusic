@@ -42,10 +42,12 @@ class AndroidPlatformMediaList : PlatformMediaList {
         }
     }
 
-    override fun getMedia(index: Int): MediaData {
-        val fd = getFdFromUri(mediaList[index])
+    override fun getMedia(index: Int): MediaData? {
+        return mediaList.getOrNull(index)?.let { uri ->
+            val fd = getFdFromUri(uri)
 
-        return MediaData(Media(libVLC as LibVLC, fd), fd)
+            MediaData(Media(libVLC as LibVLC, fd), fd)
+        }
     }
 
     override fun removeMedia(index: Int) {

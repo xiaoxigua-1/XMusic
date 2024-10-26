@@ -13,10 +13,16 @@ class MusicPlayer(context: Any) {
     }
 
     fun setMedia(index: Int) {
-        vlcPlayer.setMedia(mediaList.getMedia(index))
+        val media = mediaList.getMedia(index)
+        if (media != null)
+            vlcPlayer.setMedia(media)
     }
 
-    fun getUri(index: Int) = mediaList.mediaList[index]
+    fun getUri(index: Int): Any? {
+        return if (mediaList.mediaList.size > index && index > 0) {
+            mediaList.mediaList[index]
+        } else null
+    }
 
     fun getProgress(): Progress = vlcPlayer.getProgress()
 
@@ -41,7 +47,8 @@ class MusicPlayer(context: Any) {
             mediaList.getLength() - 1
         }
 
-        setMedia(ret)
+        if (ret > 0)
+            setMedia(ret)
 
         return ret
     }

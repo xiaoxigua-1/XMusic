@@ -8,11 +8,11 @@ interface PlatformVLCPlayer {
 
     fun setMedia(media: MediaData)
 
-    fun play()
+    fun play(): Boolean
 
-    fun pause()
+    fun pause(): Boolean
 
-    fun stop()
+    fun stop(): Boolean
 
     fun setPosition(pos: Float)
 
@@ -33,7 +33,7 @@ interface PlatformMediaList {
 
     fun addMedia(uri: Any)
 
-    fun getMedia(index: Int): MediaData
+    fun getMedia(index: Int): MediaData?
 
     fun removeMedia(index: Int)
 

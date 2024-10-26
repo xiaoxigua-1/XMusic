@@ -117,44 +117,39 @@ fun MusicPlayerScreen(musicPlayer: MusicPlayer) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (currentMetas != null) {
-                Text(
-                    text = currentMetas.title ?: getFileName(
-                        context,
-                        musicPlayer.getUri(current) as Uri
-                    )!!, fontSize = 24.sp
-                )
-                Text(text = currentMetas.artist ?: "Unknown Artist", fontSize = 12.sp)
+            Text(
+                text = currentMetas?.title ?: getFileName(
+                    context,
+                    musicPlayer.getUri(current) as Uri?
+                ) ?: "Unknown title", fontSize = 24.sp
+            )
+            Text(text = currentMetas?.artist ?: "Unknown Artist", fontSize = 12.sp)
 
-                Box(modifier = Modifier.padding(50.dp, 20.dp)) {
-                    VinylAlbumCoverAnimation(isPlaying, currentMetas.artworkURL)
+            Box(modifier = Modifier.padding(50.dp, 20.dp)) {
+                VinylAlbumCoverAnimation(isPlaying, currentMetas?.artworkURL)
+            }
+
+            ProgressSlider(progress, isPlaying, musicPlayer)
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ControlButton(Icons.Sharp.SkipPrevious, 64.dp) {
+                    current = musicPlayer.prev(current)
+                    isPlaying = musicPlayer.vlcPlayer.play()
                 }
-
-                ProgressSlider(progress, isPlaying, musicPlayer)
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
+                ControlButton(
+                    if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    86.dp
                 ) {
-                    ControlButton(Icons.Sharp.SkipPrevious, 64.dp) {
-                        current = musicPlayer.prev(current)
+                    isPlaying = if (!isPlaying) {
                         musicPlayer.vlcPlayer.play()
-                        isPlaying = true
-                    }
-                    ControlButton(
-                        if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                        86.dp
-                    ) {
-                        isPlaying = !isPlaying
-                        if (isPlaying) {
-                            musicPlayer.vlcPlayer.play()
-                        } else musicPlayer.vlcPlayer.pause()
-                    }
-                    ControlButton(Icons.Sharp.SkipNext, 64.dp) {
-                        current = musicPlayer.next(current)
-                        musicPlayer.vlcPlayer.play()
-                        isPlaying = true
-                    }
+                    } else !musicPlayer.vlcPlayer.pause()
+                }
+                ControlButton(Icons.Sharp.SkipNext, 64.dp) {
+                    current = musicPlayer.next(current)
+                    isPlaying = musicPlayer.vlcPlayer.play()
                 }
             }
         }
@@ -207,15 +202,17 @@ fun formatDuration(milliseconds: Long): String {
     return String.format(Locale.US, "%02d:%02d", minutes, seconds)
 }
 
-fun getFileName(context: Context, uri: Uri): String? {
+fun getFileName(context: Context, uri: Uri?): String? {
     var fileName: String? = null
     // 使用 ContentResolver 查詢 URI
-    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-        if (cursor.moveToFirst()) {
-            // 查找檔案名稱的欄位 (通常是 OpenableColumns.DISPLAY_NAME)
-            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            if (nameIndex != -1) {
-                fileName = cursor.getString(nameIndex)
+    if (uri != null) {
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                // 查找檔案名稱的欄位 (通常是 OpenableColumns.DISPLAY_NAME)
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (nameIndex != -1) {
+                    fileName = cursor.getString(nameIndex)
+                }
             }
         }
     }
