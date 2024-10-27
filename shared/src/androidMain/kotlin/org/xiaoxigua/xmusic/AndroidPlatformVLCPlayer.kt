@@ -1,6 +1,5 @@
 package org.xiaoxigua.xmusic
 
-import android.content.res.AssetFileDescriptor
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
@@ -21,11 +20,10 @@ class AndroidPlatformVLCPlayer : PlatformVLCPlayer {
 
     override fun setMedia(media: MediaData) {
         if (mediaPlayer.hasMedia()) {
-            (this.media?.fd as AssetFileDescriptor?)?.close()
-            (this.media?.media as Media?)?.release()
+            this.media?.release()
         }
-        mediaPlayer.media = media.media as Media
         this.media = media
+        mediaPlayer.media = media.media as Media
     }
 
     override fun play(): Boolean {

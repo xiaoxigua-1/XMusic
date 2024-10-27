@@ -1,4 +1,4 @@
-package org.xiaoxigua.xmusic.android
+package org.xiaoxigua.xmusic.android.components
 
 import android.graphics.BitmapFactory
 import androidx.compose.animation.core.Animatable
@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import org.xiaoxigua.xmusic.android.R
 import java.io.File
 import java.net.URI
 

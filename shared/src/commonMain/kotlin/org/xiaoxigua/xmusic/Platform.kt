@@ -31,7 +31,11 @@ interface PlatformMediaList {
 
     fun init(libVlc: Any)
 
-    fun addMedia(uri: Any)
+    /**
+     * @param[uri] media uri
+     * @return Return whether this URI format is supported.
+     */
+    fun addMedia(uri: Any): Boolean
 
     fun getMedia(index: Int): MediaData?
 

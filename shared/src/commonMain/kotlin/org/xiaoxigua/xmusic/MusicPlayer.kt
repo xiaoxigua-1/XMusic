@@ -1,54 +1,56 @@
 package org.xiaoxigua.xmusic
 
-class MusicPlayer(context: Any) {
+abstract class MusicPlayer(context: Any) {
     private val platformLibVLC: PlatformLibVLC = getPlatformLibVLC()
+    protected var libVLC: Any = platformLibVLC.getLibVLC(context)
     val vlcPlayer: PlatformVLCPlayer = getPlatformVLCPlayer()
-    val mediaList: PlatformMediaList = getPlatformMediaList()
+    abstract val mediaLists: MutableList<PlatformMediaList>
 
     init {
-        val libVLC = platformLibVLC.getLibVLC(context)
-
         vlcPlayer.init(libVLC)
-        mediaList.init(libVLC)
     }
 
-    fun setMedia(index: Int) {
-        val media = mediaList.getMedia(index)
+    private fun setMedia(currentPlayList: Int, index: Int) {
+        val media = getCurrentPlayList(currentPlayList)?.getMedia(index)
         if (media != null)
             vlcPlayer.setMedia(media)
     }
 
-    fun getUri(index: Int): Any? {
-        return if (mediaList.mediaList.size > index && index > 0) {
-            mediaList.mediaList[index]
-        } else null
+    fun getCurrentPlayList(currentPlayList: Int): PlatformMediaList? {
+        return if (currentPlayList < mediaLists.size && currentPlayList > 0)
+            mediaLists[currentPlayList]
+        else null
     }
 
     fun getProgress(): Progress = vlcPlayer.getProgress()
 
-    fun getMeta(index: Int): AudioMeta? = mediaList.getMediaMetas(index)
+    fun getMeta(currentPlayList: Int, index: Int): AudioMeta? = getCurrentPlayList(currentPlayList)?.getMediaMetas(index)
 
-    fun next(index: Int): Int {
-        val ret = if (index + 1 < mediaList.getLength()) {
+    private fun getCurrentPlaylistLength(currentPlayList: Int) = getCurrentPlayList(currentPlayList)?.getLength() ?: 0
+
+    abstract fun addPlaylist(mediaList: PlatformMediaList)
+
+    fun next(currentPlayList: Int, index: Int): Int {
+        val ret = if (index + 1 < getCurrentPlaylistLength(currentPlayList)) {
             index + 1
         } else {
             0
         }
 
-        setMedia(ret)
+        setMedia(currentPlayList, ret)
 
         return ret
     }
 
-    fun prev(index: Int): Int {
+    fun prev(currentPlayList: Int, index: Int): Int {
         val ret = if (index - 1 > 0) {
             index - 1
         } else {
-            mediaList.getLength() - 1
+            getCurrentPlaylistLength(currentPlayList) - 1
         }
 
         if (ret > 0)
-            setMedia(ret)
+            setMedia(currentPlayList, ret)
 
         return ret
     }
