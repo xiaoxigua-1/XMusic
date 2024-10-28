@@ -22,11 +22,13 @@ abstract class MusicPlayer(context: Any) {
         else null
     }
 
+    private fun getCurrentPlaylistLength(currentPlayList: Int) =
+        getCurrentPlayList(currentPlayList)?.getLength() ?: 0
+
     fun getProgress(): Progress = vlcPlayer.getProgress()
 
-    fun getMeta(currentPlayList: Int, index: Int): AudioMeta? = getCurrentPlayList(currentPlayList)?.getMediaMetas(index)
-
-    private fun getCurrentPlaylistLength(currentPlayList: Int) = getCurrentPlayList(currentPlayList)?.getLength() ?: 0
+    fun getMeta(currentPlayList: Int, index: Int): AudioMeta? =
+        getCurrentPlayList(currentPlayList)?.getMediaMetas(index)
 
     abstract fun addPlaylist(mediaList: PlatformMediaList)
 

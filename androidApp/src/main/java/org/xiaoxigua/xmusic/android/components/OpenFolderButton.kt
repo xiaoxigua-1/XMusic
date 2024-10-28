@@ -4,8 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,15 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
-import org.xiaoxigua.xmusic.AndroidMusicPlayer
-import org.xiaoxigua.xmusic.MusicPlayer
-import org.xiaoxigua.xmusic.getPlatformMediaList
+import org.xiaoxigua.xmusic.android.LocalMusicPlayer
 
 @Composable
-fun OpenFolderScreen(musicPlayer: MusicPlayer, importIndex: Int) {
+fun OpenFolderScreen(importIndex: Int, button: @Composable (() -> Unit) -> Unit) {
+    val musicPlayer = LocalMusicPlayer.current
     var selectedFolderUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
 
@@ -52,17 +47,7 @@ fun OpenFolderScreen(musicPlayer: MusicPlayer, importIndex: Int) {
     }
 
     // Add icon Button
-    ControlButton(Icons.Filled.Add, 40.dp) {
+    button {
         folderPickerLauncher.launch(null)
     }
-}
-
-@Preview
-@Composable
-fun PreviewOpenFolderScreen() {
-    val musicPlayer = AndroidMusicPlayer(LocalContext.current)
-
-    musicPlayer.addPlaylist(getPlatformMediaList())
-
-    OpenFolderScreen(musicPlayer, 0)
 }

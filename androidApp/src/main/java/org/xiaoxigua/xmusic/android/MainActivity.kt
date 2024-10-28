@@ -42,9 +42,12 @@ fun Main() {
     val musicPlayer = AndroidMusicPlayer(LocalContext.current)
     val currentPlayList = remember { mutableIntStateOf(0) }
 
-    CompositionLocalProvider(LocalCurrentPlaylist provides currentPlayList, LocalMusicPlayer provides musicPlayer) {
+    CompositionLocalProvider(
+        LocalCurrentPlaylist provides currentPlayList,
+        LocalMusicPlayer provides musicPlayer
+    ) {
         PlaylistList()
-        MusicPlayerScreen()
+        MusicPlayerScreenAnchoredDraggable()
     }
 }
 
