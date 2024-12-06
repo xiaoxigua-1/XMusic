@@ -33,4 +33,10 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             playlistDao.addPlaylist(playlist)
         }
     }
+
+    fun deletePlaylist(playlist: Playlist) {
+        viewModelScope.launch(Dispatchers.IO) {
+            playlistDao.deletePlaylist(playlist)
+        }
+    }
 }

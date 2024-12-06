@@ -2,6 +2,7 @@ package org.xiaoxigua.xmusic.android.room.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Embedded
 import androidx.room.Insert
 import androidx.room.Junction
@@ -33,6 +34,9 @@ interface PlaylistDao {
 
     @Insert
     fun addPlaylist(playlist: Playlist)
+
+    @Delete
+    fun deletePlaylist(playlist: Playlist)
 
     @Insert
     fun addSongToPlaylist(ref: PlaylistSongCrossRef)

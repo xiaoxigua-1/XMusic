@@ -20,7 +20,9 @@ fun HomeScreen(userViewModel: UserViewModel) {
 
     LazyColumn(modifier = Modifier.padding(vertical = 10.dp)) {
         items(playlist, key = { it.playlistId }) {
-            PlaylistItem(it.title, it.description) { }
+            PlaylistItem(it.title, it.description, {}, {
+                userViewModel.deletePlaylist(it)
+            })
         }
     }
 }
