@@ -24,21 +24,24 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import org.xiaoxigua.xmusic.android.Screens
+import org.xiaoxigua.xmusic.android.ui.theme.ContainerColor
+import org.xiaoxigua.xmusic.android.ui.theme.DisabledLightGray
 import org.xiaoxigua.xmusic.android.ui.theme.Purple
-import org.xiaoxigua.xmusic.android.ui.theme.UnselectedLightGray
 import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 
 @Composable
 fun BottomBar(navController: NavController) {
     NavigationBar(
-        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-        containerColor = Color(0xFF2A2A2A)
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        containerColor = ContainerColor
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
         Screens.entries.forEach { screen ->
-            val selectColor = if (currentRoute != screen.route) UnselectedLightGray else Purple
+            val selectColor = if (currentRoute != screen.route) DisabledLightGray else Purple
 
             NavigationBarItem(
                 selected = currentRoute == screen.route,
@@ -65,7 +68,7 @@ fun BottomBar(navController: NavController) {
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Purple,
-                    unselectedIconColor = UnselectedLightGray,
+                    unselectedIconColor = DisabledLightGray,
                     indicatorColor = Color.Transparent
                 ),
             )
@@ -75,7 +78,7 @@ fun BottomBar(navController: NavController) {
 
 @Preview
 @Composable
-fun GreetingPreview() {
+fun BottomBarPreview() {
     XMusicTheme {
         Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = { BottomBar(
             NavController(
