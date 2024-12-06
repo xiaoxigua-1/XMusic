@@ -9,10 +9,10 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,11 +26,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 enum class DragAnchors {
@@ -49,11 +51,21 @@ fun DraggableItem(
     val density = LocalDensity.current
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
     var isDeleted by remember { mutableStateOf(false) }
+    val deletedScale = remember { Animatable(1f) }
     val deletedOffset = remember { Animatable(0f) }
 
+    // Deleted animate
     LaunchedEffect(isDeleted) {
         if (isDeleted) {
-            deletedOffset.animateTo(-boxSize.height.toFloat(), animationSpec = tween(durationMillis = 300))
+            launch {
+                deletedScale.animateTo(0f, animationSpec = tween(durationMillis = 300))
+            }
+            launch {
+                deletedOffset.animateTo(
+                    -boxSize.height.toFloat() / 2,
+                    animationSpec = tween(durationMillis = 300)
+                )
+            }
 
             delay(300)
 
@@ -63,17 +75,26 @@ fun DraggableItem(
         }
     }
 
+    // Right Swipe event
     LaunchedEffect(state) {
         snapshotFlow { state.settledValue }.collect { newValue ->
             if (newValue == DragAnchors.End)
                 isDeleted = true
         }
     }
+
     Box(
         modifier = Modifier
-            .fillMaxSize()
             .clip(RectangleShape)
+            .wrapContentSize()
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, (placeable.height * deletedScale.value).toInt()) {
+                    placeable.place(0, 0)
+                }
+            }
             .graphicsLayer(
+                scaleY = deletedScale.value,
                 translationY = deletedOffset.value
             ),
         contentAlignment = Alignment.CenterStart

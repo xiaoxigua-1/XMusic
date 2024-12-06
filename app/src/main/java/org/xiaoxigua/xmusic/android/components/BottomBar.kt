@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
@@ -31,11 +31,11 @@ import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 
 @Composable
 fun BottomBar(navController: NavController) {
-    NavigationBar(
+    BottomAppBar(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-        containerColor = ContainerColor
+        containerColor = ContainerColor,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -61,9 +61,9 @@ fun BottomBar(navController: NavController) {
                             imageVector = screen.icon,
                             contentDescription = null,
                             tint = selectColor,
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(24.dp)
                         )
-                        Text(text = screen.route, color = selectColor, fontSize = 15.sp)
+                        Text(text = screen.route, color = selectColor, fontSize = 11.sp)
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(

@@ -5,6 +5,7 @@ import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.layout.Box
@@ -40,7 +41,13 @@ import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PlaylistItem(title: String, description: String, onEdit: () -> Unit, onDelete: () -> Unit) {
+fun PlaylistItem(
+    title: String,
+    description: String,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onSelected: () -> Unit
+) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val defaultActionSize = configuration.screenWidthDp.dp
@@ -71,12 +78,13 @@ fun PlaylistItem(title: String, description: String, onEdit: () -> Unit, onDelet
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { onSelected() }
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(40.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(MinContainerColor), contentAlignment = Alignment.Center
                 ) {
@@ -84,16 +92,18 @@ fun PlaylistItem(title: String, description: String, onEdit: () -> Unit, onDelet
                         imageVector = Icons.Filled.LibraryMusic,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
-                Column(modifier = Modifier.weight(1f).padding(start = 30.dp)) {
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 24.dp)) {
                     Text(
                         text = title,
                         color = HighLightGray,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
+                        fontSize = 16.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -101,6 +111,7 @@ fun PlaylistItem(title: String, description: String, onEdit: () -> Unit, onDelet
                         text = description,
                         color = MediumLightGray,
                         fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -133,8 +144,6 @@ fun PlaylistItem(title: String, description: String, onEdit: () -> Unit, onDelet
 @Composable
 fun PlaylistItemPreview() {
     XMusicTheme {
-        PlaylistItem("Playlist title", "Description", {}) {
-
-        }
+        PlaylistItem("Playlist title", "Description", {}, {}, {})
     }
 }

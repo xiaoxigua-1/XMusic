@@ -21,8 +21,6 @@ import org.xiaoxigua.xmusic.android.ui.theme.Purple
 @Composable
 fun AddPlaylist(userViewModel: UserViewModel) {
     var openDialog by remember { mutableStateOf(false) }
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
 
     TextButton(
         {
@@ -38,53 +36,63 @@ fun AddPlaylist(userViewModel: UserViewModel) {
     }
 
     if (openDialog)
-        AlertDialog(
-            title = {
-                Text(text = "Add Playlist")
-            },
-            onDismissRequest = {
-                openDialog = false
-            },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        title,
-                        onValueChange = { title = it },
-                        label = { Text("Title") }
-                    )
-                    OutlinedTextField(
-                        description,
-                        onValueChange = { description = it },
-                        label = { Text("Description") }
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val playlist = Playlist(title = title, description = description)
+        PlaylistAlertDialog("Add Playlist", "Add", { title, description ->
+            val playlist = Playlist(title = title, description = description)
 
-                        userViewModel.addPlaylist(playlist)
+            userViewModel.addPlaylist(playlist)
+            openDialog = false
+        }, {
+            openDialog = false
+        })
+}
 
-                        title = ""
-                        description = ""
-                        openDialog = false
-                    }
-                ) {
-                    Text("Confirm")
+@Composable
+fun PlaylistAlertDialog(
+    alertDialogTitle: String,
+    confirmButton: String,
+    onConfirm: (String, String) -> Unit,
+    onDismiss: () -> Unit,
+    titleInit: String? = null,
+    descriptionInit: String? = null
+) {
+    var title by remember { mutableStateOf(titleInit ?: "") }
+    var description by remember { mutableStateOf(descriptionInit ?: "") }
+
+    AlertDialog(
+        title = {
+            Text(alertDialogTitle)
+        },
+        onDismissRequest = onDismiss,
+        text = {
+            Column {
+                OutlinedTextField(
+                    title,
+                    onValueChange = { title = it },
+                    label = { Text("Title") }
+                )
+                OutlinedTextField(
+                    description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") }
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm(title, description)
                 }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        title = ""
-                        description = ""
-                        openDialog = false
-                    }
-                ) {
-                    Text("Dismiss", color = DisabledLightGray)
-                }
-            },
-            containerColor = ContainerColor
-        )
+            ) {
+                Text(confirmButton)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text("Cancel", color = DisabledLightGray)
+            }
+        },
+        containerColor = ContainerColor
+    )
 }

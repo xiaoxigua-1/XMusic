@@ -22,7 +22,7 @@ fun HomeScreen(userViewModel: UserViewModel) {
         items(playlist, key = { it.playlistId }) {
             PlaylistItem(it.title, it.description, {}, {
                 userViewModel.deletePlaylist(it)
-            })
+            }, {})
         }
     }
 }
