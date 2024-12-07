@@ -1,6 +1,7 @@
 package org.xiaoxigua.xmusic.android.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -16,12 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LibraryMusic
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +57,8 @@ fun PlaylistItem(
     val startActionSizePx = with(density) { -defaultActionSize.toPx() }
     val anchors = DraggableAnchors {
         DragAnchors.Normal at 0f
-        DragAnchors.End at startActionSizePx
+        DragAnchors.RightMenu at startActionSizePx / 2
+        DragAnchors.Deleted at startActionSizePx
     }
     val state = remember {
         AnchoredDraggableState(
@@ -71,6 +75,7 @@ fun PlaylistItem(
             confirmValueChange = { true }
         )
     }
+    val isDeleted = remember { mutableStateOf(false) }
 
     DraggableItem(
         state,
@@ -116,27 +121,55 @@ fun PlaylistItem(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-
-                IconButton(onEdit) {
-                    Icon(
-                        imageVector = Icons.Filled.MoreVert,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
             }
         },
-        endAction = {
-            Text(
-                "Delete",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                overflow = TextOverflow.Clip,
-                maxLines = 1
+        endActions = arrayOf({ height ->
+            val width by animateFloatAsState(
+                when (state.currentValue) {
+                    DragAnchors.Deleted -> 0f
+                    else -> -state.requireOffset() / 2
+                }, label = "WidthAnimate"
             )
-        },
-        onDelete = onDelete
+
+            Box(
+                modifier = Modifier
+                    .size(with(density) { width.toDp() }, height)
+                    .background(Color.Gray)
+                    .clickable { onEdit() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    tint = Color.White,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }, { height ->
+            val width by animateFloatAsState(
+                when (state.currentValue) {
+                    DragAnchors.Deleted -> -state.requireOffset()
+                    else -> -state.requireOffset() / 2
+                }, label = "WidthAnimate"
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(with(density) { width.toDp() }, height)
+                    .background(Color.Red)
+                    .clickable { isDeleted.value = true },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    tint = Color.White,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }),
+        onDelete = onDelete,
+        isDeleted = isDeleted
     )
 }
 
