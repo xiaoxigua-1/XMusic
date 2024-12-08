@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import org.xiaoxigua.xmusic.android.components.BottomBar
 import org.xiaoxigua.xmusic.android.components.TopBar
 import org.xiaoxigua.xmusic.android.room.UserViewModel
+import org.xiaoxigua.xmusic.android.screens.Screens
 import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 
 class MainActivity : ComponentActivity() {
@@ -47,8 +48,8 @@ fun MainCompose(userViewModel: UserViewModel = viewModel()) {
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None }) {
             Screens.entries.forEach { s ->
-                composable(s.route) {
-                    s.screen(userViewModel)
+                composable(s.route) { backStackEntry ->
+                    s.screen(navController, backStackEntry, userViewModel)
                 }
             }
         }

@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import org.xiaoxigua.xmusic.android.Screens
 import org.xiaoxigua.xmusic.android.room.UserViewModel
+import org.xiaoxigua.xmusic.android.screens.Screens
 import org.xiaoxigua.xmusic.android.ui.theme.ContainerColor
 import org.xiaoxigua.xmusic.android.ui.theme.Purple
 import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
@@ -33,11 +33,12 @@ import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 fun TopBar(navController: NavController, userViewModel: UserViewModel) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
+    val screen = Screens.entries.findLast { it.route == currentRoute }
 
     TopAppBar(
-        title = { Text(currentRoute, fontSize = 32.sp, fontWeight = FontWeight.Bold) },
+        title = { Text(screen?.title ?: "", fontSize = 32.sp, fontWeight = FontWeight.Bold) },
         navigationIcon = {
-            if (Screens.entries.findLast { it.route == currentRoute }?.canBack == true)
+            if (screen?.canBack == true)
                 IconButton(onClick = {
                     navController.popBackStack()
                 }) {

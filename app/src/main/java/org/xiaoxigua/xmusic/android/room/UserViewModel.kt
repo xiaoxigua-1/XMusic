@@ -13,7 +13,7 @@ import org.xiaoxigua.xmusic.android.room.entity.Playlist
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val db =
-        Room.databaseBuilder(application, AppDatabase::class.java, "app_database").build()
+        Room.databaseBuilder(application, AppDatabase::class.java, "database").build()
     private val playlistDao = db.playlistDao()
 
     val allPlaylist: LiveData<List<Playlist>> = playlistDao.getPlaylists()

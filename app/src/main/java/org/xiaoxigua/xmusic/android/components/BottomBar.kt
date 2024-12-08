@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import org.xiaoxigua.xmusic.android.Screens
+import org.xiaoxigua.xmusic.android.screens.Screens
 import org.xiaoxigua.xmusic.android.ui.theme.ContainerColor
 import org.xiaoxigua.xmusic.android.ui.theme.DisabledLightGray
 import org.xiaoxigua.xmusic.android.ui.theme.Purple
@@ -38,40 +38,41 @@ fun BottomBar(navController: NavController) {
         containerColor = ContainerColor,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
+        val currentRoute = navBackStackEntry?.destination?.route?.substringBefore("/")
 
         Screens.entries.forEach { screen ->
             val selectColor = if (currentRoute != screen.route) DisabledLightGray else Purple
 
-            NavigationBarItem(
-                selected = currentRoute == screen.route,
-                onClick = {
-                    if (currentRoute != screen.route) {
-                        navController.navigate(screen.route) {
-                            popUpTo(0) {
-                                inclusive = true
+            if (screen.icon != null)
+                NavigationBarItem(
+                    selected = currentRoute == screen.route,
+                    onClick = {
+                        if (currentRoute != screen.route) {
+                            navController.navigate(screen.route) {
+                                popUpTo(0) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
                             }
-                            launchSingleTop = true
                         }
-                    }
-                },
-                icon = {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = screen.icon,
-                            contentDescription = null,
-                            tint = selectColor,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(text = screen.route, color = selectColor, fontSize = 11.sp)
-                    }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Purple,
-                    unselectedIconColor = DisabledLightGray,
-                    indicatorColor = Color.Transparent
-                ),
-            )
+                    },
+                    icon = {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = screen.icon,
+                                contentDescription = null,
+                                tint = selectColor,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(text = screen.route, color = selectColor, fontSize = 11.sp)
+                        }
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Purple,
+                        unselectedIconColor = DisabledLightGray,
+                        indicatorColor = Color.Transparent
+                    ),
+                )
         }
     }
 }
