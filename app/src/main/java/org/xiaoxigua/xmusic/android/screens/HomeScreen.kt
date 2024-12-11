@@ -9,15 +9,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import org.xiaoxigua.xmusic.android.LocalNavController
+import org.xiaoxigua.xmusic.android.LocalUserViewModel
 import org.xiaoxigua.xmusic.android.components.PlaylistItem
-import org.xiaoxigua.xmusic.android.room.UserViewModel
 import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 
 @Composable
-fun HomeScreen(navController: NavHostController, userViewModel: UserViewModel) {
+fun HomeScreen() {
+    val navController = LocalNavController.current
+    val userViewModel = LocalUserViewModel.current
     val playlist by userViewModel.allPlaylist.observeAsState(emptyList())
 
     LazyColumn(modifier = Modifier.padding(vertical = 10.dp)) {
@@ -34,9 +34,7 @@ fun HomeScreen(navController: NavHostController, userViewModel: UserViewModel) {
 @Preview
 @Composable
 fun HomeScreenPreview() {
-    val navController = rememberNavController()
-
     XMusicTheme {
-        HomeScreen(navController, viewModel())
+        HomeScreen()
     }
 }

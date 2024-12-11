@@ -10,16 +10,7 @@ import org.videolan.libvlc.interfaces.IMedia
 import org.xiaoxigua.xmusic.android.room.entity.Song
 import org.xiaoxigua.xmusic.android.room.entity.SongType
 
-sealed class MediaData(private val libVLC: LibVLC, private val song: Song) {
-    constructor(libVLC: LibVLC, uri: Uri) : this(
-        libVLC, Song(
-            uri = uri.toString(), type = when (uri.scheme) {
-                "content" -> SongType.Content
-                else -> SongType.HTTP
-            }
-        )
-    )
-
+sealed class MediaData(private val libVLC: LibVLC, open val song: Song) {
     private fun getFileName(uri: Uri): String? {
         var fileName: String? = null
         // 使用 ContentResolver 查詢 URI
@@ -60,7 +51,8 @@ sealed class MediaData(private val libVLC: LibVLC, private val song: Song) {
             ) else title,
             artist = artist, album = album, artworkURL = artworkURL,
             uri = song.uri,
-            type = song.type
+            type = song.type,
+            playlistId = song.playlistId
         )
     }
 
@@ -68,7 +60,7 @@ sealed class MediaData(private val libVLC: LibVLC, private val song: Song) {
 
     abstract val media: Media
 
-    class LocalFile(private val libVLC: LibVLC, private val song: Song) : MediaData(libVLC, song) {
+    class LocalFile(private val libVLC: LibVLC, override val song: Song) : MediaData(libVLC, song) {
         @SuppressLint("Recycle")
         fun getFdFromUri(): AssetFileDescriptor? {
             return libVLC.appContext.contentResolver.openAssetFileDescriptor(
@@ -101,6 +93,18 @@ sealed class MediaData(private val libVLC: LibVLC, private val song: Song) {
                 SongType.Content -> LocalFile(libVLC, song)
                 SongType.HTTP -> HTTPStream(libVLC, song)
             }
+        }
+
+        fun init(libVLC: LibVLC, playlistId: Long, uri: Uri): MediaData {
+            val type = when (uri.scheme) {
+                "content" -> SongType.Content
+                else -> SongType.HTTP
+            }
+            val song = Song(
+                uri = uri.toString(), type = type, playlistId = playlistId
+            )
+
+            return getMediaData(libVLC, song)
         }
     }
 }

@@ -15,14 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import org.xiaoxigua.xmusic.android.room.UserViewModel
+import org.xiaoxigua.xmusic.android.LocalNavController
 import org.xiaoxigua.xmusic.android.screens.Screens
 import org.xiaoxigua.xmusic.android.ui.theme.ContainerColor
 import org.xiaoxigua.xmusic.android.ui.theme.Purple
@@ -30,7 +27,8 @@ import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController, userViewModel: UserViewModel) {
+fun TopBar() {
+    val navController = LocalNavController.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
     val screen = Screens.entries.findLast { it.route == currentRoute }
@@ -51,7 +49,7 @@ fun TopBar(navController: NavController, userViewModel: UserViewModel) {
         actions = {
             Screens.entries.findLast { it.route == currentRoute }?.rightButton?.let {
                 it(
-                    userViewModel
+                    navBackStackEntry
                 )
             }
         },
@@ -70,11 +68,7 @@ fun TopBar(navController: NavController, userViewModel: UserViewModel) {
 fun TopBarPreview() {
     XMusicTheme {
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-            TopBar(
-                NavController(
-                    LocalContext.current
-                ), viewModel()
-            )
+            TopBar()
         }) { innerPadding ->
             Text("", modifier = Modifier.padding(innerPadding))
         }

@@ -17,12 +17,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import org.xiaoxigua.xmusic.android.LocalNavController
 import org.xiaoxigua.xmusic.android.screens.Screens
 import org.xiaoxigua.xmusic.android.ui.theme.ContainerColor
 import org.xiaoxigua.xmusic.android.ui.theme.DisabledLightGray
@@ -30,7 +29,9 @@ import org.xiaoxigua.xmusic.android.ui.theme.Purple
 import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 
 @Composable
-fun BottomBar(navController: NavController) {
+fun BottomBar() {
+    val navController = LocalNavController.current
+
     BottomAppBar(
         modifier = Modifier
             .fillMaxWidth()
@@ -81,10 +82,7 @@ fun BottomBar(navController: NavController) {
 @Composable
 fun BottomBarPreview() {
     XMusicTheme {
-        Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = { BottomBar(
-            NavController(
-                LocalContext.current)
-        ) }) { innerPadding ->
+        Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = { BottomBar() }) { innerPadding ->
             Text("", modifier = Modifier.padding(innerPadding))
         }
     }

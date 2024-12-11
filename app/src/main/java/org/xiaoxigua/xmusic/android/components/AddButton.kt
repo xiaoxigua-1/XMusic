@@ -7,24 +7,27 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import org.xiaoxigua.xmusic.android.room.UserViewModel
-import org.xiaoxigua.xmusic.android.room.entity.Playlist
 import org.xiaoxigua.xmusic.android.ui.theme.ContainerColor
 import org.xiaoxigua.xmusic.android.ui.theme.DisabledLightGray
 import org.xiaoxigua.xmusic.android.ui.theme.Purple
 
 @Composable
-fun AddPlaylist(userViewModel: UserViewModel) {
-    var openDialog by remember { mutableStateOf(false) }
+fun AddButton(
+    content: @Composable ((MutableState<Boolean>) -> Unit)? = null,
+    onClickable: (() -> Unit)? = null
+) {
+    val openDialog = remember { mutableStateOf(false) }
 
     TextButton(
         {
-            openDialog = true
+            openDialog.value = true
+            onClickable?.invoke()
         }, colors = ButtonColors(
             containerColor = Color.Transparent,
             contentColor = Purple,
@@ -35,19 +38,13 @@ fun AddPlaylist(userViewModel: UserViewModel) {
         Text("Add", color = Purple)
     }
 
-    if (openDialog)
-        PlaylistAlertDialog("Add Playlist", "Add", { title, description ->
-            val playlist = Playlist(title = title, description = description)
+    if (openDialog.value)
+        content?.invoke(openDialog)
 
-            userViewModel.addPlaylist(playlist)
-            openDialog = false
-        }, {
-            openDialog = false
-        })
 }
 
 @Composable
-fun PlaylistAlertDialog(
+fun AddButtonAlertDialog(
     alertDialogTitle: String,
     confirmButton: String,
     onConfirm: (String, String) -> Unit,
