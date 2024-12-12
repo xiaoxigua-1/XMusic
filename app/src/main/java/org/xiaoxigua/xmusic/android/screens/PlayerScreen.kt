@@ -114,19 +114,19 @@ fun PlayerScreen(paddingValues: PaddingValues) {
                         text = nowPlayingSong?.title ?: "Unknown Title",
                         color = HighLightGray,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        lineHeight = 16.sp
+                        lineHeight = 14.sp
                     )
                     Text(
                         text = nowPlayingSong?.artist ?: "Unknown Artist",
                         color = MediumLightGray,
                         fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        lineHeight = 14.sp
+                        lineHeight = 12.sp
                     )
                 }
 

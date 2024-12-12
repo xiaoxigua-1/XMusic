@@ -65,7 +65,7 @@ class MusicPlayer(private val libVLC: LibVLC) : ViewModel() {
     fun next() {
         val prvIndex = _nowPlaylist.value?.index?.value ?: 0
 
-        val nowSong = if (prvIndex < _nowPlaylist.value?.songs?.size!!) {
+        val nowSong = if (prvIndex + 1 < _nowPlaylist.value?.songs?.size!!) {
             _nowPlaylist.value?.index?.value = prvIndex + 1
 
             _nowPlaylist.value?.songs!![prvIndex + 1]
