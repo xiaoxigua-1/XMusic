@@ -35,25 +35,31 @@ sealed class MediaData(private val libVLC: LibVLC, open val song: Song) {
         return fileName
     }
 
-    fun getMediaMetas(): Song {
+    fun getMediaMetas(): Song? {
         media.parse()
 
-        val title = media.getMeta(IMedia.Meta.Title)
-        val artist = media.getMeta(IMedia.Meta.Artist)
-        val album = media.getMeta(IMedia.Meta.Album)
-        val artworkURL = media.getMeta(IMedia.Meta.ArtworkURL)
+        val isSupported = media.tracks?.isNotEmpty()
+
+        val result = if (isSupported == true) {
+            val title = media.getMeta(IMedia.Meta.Title)
+            val artist = media.getMeta(IMedia.Meta.Artist)
+            val album = media.getMeta(IMedia.Meta.Album)
+            val artworkURL = media.getMeta(IMedia.Meta.ArtworkURL)
+
+            Song(
+                title = if (title == "imem://") getFileName(
+                    Uri.parse(song.uri)
+                ) else title,
+                artist = artist, album = album, artworkURL = artworkURL,
+                uri = song.uri,
+                type = song.type,
+                playlistId = song.playlistId
+            )
+        } else null
 
         release()
 
-        return Song(
-            title = if (title == "imem://") getFileName(
-                Uri.parse(song.uri)
-            ) else title,
-            artist = artist, album = album, artworkURL = artworkURL,
-            uri = song.uri,
-            type = song.type,
-            playlistId = song.playlistId
-        )
+        return result
     }
 
     abstract fun release()

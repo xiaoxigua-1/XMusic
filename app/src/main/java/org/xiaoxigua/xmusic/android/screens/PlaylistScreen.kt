@@ -16,14 +16,15 @@ import org.xiaoxigua.xmusic.android.room.UserViewModel
 @Composable
 fun PlaylistScreen(userViewModel: UserViewModel, playlistId: Long) {
     val musicPlayer = LocalMusicPlayer.current
+    val nowPlaying by musicPlayer.nowPlaylist.observeAsState()
+    val nowPlayingIndex = nowPlaying?.index?.observeAsState()
     val songs by userViewModel.queryPlaylistSongs(playlistId).observeAsState(emptyList())
 
     LazyColumn(
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
         itemsIndexed(songs, key = { _, song -> song.songId }) { index, song ->
-            SongItem(song) {
-                println(index)
+            SongItem(song, nowPlaying?.playlist == playlistId && nowPlayingIndex?.value == index) {
                 musicPlayer.setPlaylist(PlaylistData(playlistId, songs, MutableLiveData(index)))
             }
         }

@@ -96,9 +96,11 @@ enum class Screens(
                     folder?.listFiles()?.forEach { file ->
                         if (file != null && file.isFile) {
                             val media = MediaData.init(libVLC, playlistId.toLong(), file.uri)
+                            val metas = media.getMediaMetas()
 
-                            userViewModel.addSong(media.getMediaMetas())
-                            media.release()
+                            metas?.let {
+                                userViewModel.addSong(metas)
+                            }
                         }
                     }
                 }

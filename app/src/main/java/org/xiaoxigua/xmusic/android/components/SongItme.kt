@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +38,7 @@ import java.io.File
 import java.net.URI
 
 @Composable
-fun SongItem(song: Song, onClickable: (() -> Unit)? = null) {
+fun SongItem(song: Song, isPlaying: Boolean = true, onClickable: (() -> Unit)? = null) {
     val painter = if (song.artworkURL != null) {
         val artworkImageFile = File(URI.create(song.artworkURL))
         val bitmap = BitmapFactory.decodeFile(artworkImageFile.absolutePath)
@@ -71,6 +72,10 @@ fun SongItem(song: Song, onClickable: (() -> Unit)? = null) {
                     tint = Color.White,
                     modifier = Modifier.size(36.dp)
                 )
+            if (isPlaying)
+                Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(0.4f)), contentAlignment = Alignment.Center) {
+                    Icon(imageVector = Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(48.dp))
+                }
         }
 
 
