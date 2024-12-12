@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,6 +53,7 @@ fun PlayerScreen(paddingValues: PaddingValues) {
     val nowPlayingSong = nowPlaying?.songs?.get(nowPlaylistIndex?.value ?: 0)
 
     val isPlaying by musicPlayer.isPlaying.observeAsState()
+    val progress by musicPlayer.progress.observeAsState()
 
     val painter = if (nowPlayingSong?.artworkURL != null) {
         val artworkImageFile = File(URI.create(nowPlayingSong.artworkURL))
@@ -63,13 +65,23 @@ fun PlayerScreen(paddingValues: PaddingValues) {
     Column(modifier = Modifier.padding(paddingValues)) {
         Spacer(modifier = Modifier.weight(1f))
 
-        Box(modifier = Modifier.padding(10.dp)) {
-            Row(
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(BottomContainerColor)
+        ) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(BottomContainerColor)
-                    .padding(vertical = 4.dp, horizontal = 6.dp),
+                    .fillMaxWidth(progress?.position ?: 0f)
+                    .height(1.dp)
+                    .background(Color.White)
+                    .align(Alignment.BottomStart)
+            )
+
+            Row(
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
