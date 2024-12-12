@@ -3,6 +3,7 @@ package org.xiaoxigua.xmusic.android.components
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +37,7 @@ import java.io.File
 import java.net.URI
 
 @Composable
-fun SongItem(song: Song) {
+fun SongItem(song: Song, onClickable: (() -> Unit)? = null) {
     val painter = if (song.artworkURL != null) {
         val artworkImageFile = File(URI.create(song.artworkURL))
         val bitmap = BitmapFactory.decodeFile(artworkImageFile.absolutePath)
@@ -47,6 +48,7 @@ fun SongItem(song: Song) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClickable?.invoke() }
             .padding(horizontal = 16.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

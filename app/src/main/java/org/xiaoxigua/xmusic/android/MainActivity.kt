@@ -24,6 +24,7 @@ import org.xiaoxigua.xmusic.android.components.BottomBar
 import org.xiaoxigua.xmusic.android.components.TopBar
 import org.xiaoxigua.xmusic.android.core.MusicPlayer
 import org.xiaoxigua.xmusic.android.room.UserViewModel
+import org.xiaoxigua.xmusic.android.screens.PlayerScreen
 import org.xiaoxigua.xmusic.android.screens.Screens
 import org.xiaoxigua.xmusic.android.ui.theme.XMusicTheme
 
@@ -86,6 +87,7 @@ fun MainCompose() {
                     }
                 }
             }
+            PlayerScreen(innerPadding)
         }
     }
 }

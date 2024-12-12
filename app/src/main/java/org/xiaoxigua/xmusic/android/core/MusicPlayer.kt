@@ -37,7 +37,7 @@ class MusicPlayer(private val libVLC: LibVLC) : ViewModel() {
             if (e.esChangedType == 0)
                 _progress.value = Progress(mediaPlayer.time, e.positionChanged, mediaPlayer.length)
             if (e.type == MediaPlayer.Event.EndReached) {
-
+                next()
             }
         }
     }
@@ -65,9 +65,9 @@ class MusicPlayer(private val libVLC: LibVLC) : ViewModel() {
     }
 
     fun next() {
-        if (_nowPlaylist.value?.index?.value!! < _nowPlaylist.value?.songs?.value?.size!!) {
+        if (_nowPlaylist.value?.index?.value!! < _nowPlaylist.value?.songs?.size!!) {
             val prvIndex = _nowPlaylist.value?.index?.value ?: 0
-            val nowSong = _nowPlaylist.value?.songs?.value!![prvIndex + 1]
+            val nowSong = _nowPlaylist.value?.songs!![prvIndex + 1]
 
             _nowPlaylist.value?.index?.value = prvIndex + 1
             setMedia(MediaData.getMediaData(libVLC, nowSong))
@@ -86,9 +86,9 @@ class MusicPlayer(private val libVLC: LibVLC) : ViewModel() {
     }
 
     fun setPlaylist(playlistData: PlaylistData) {
-        mediaPlayer.stop()
+        mediaPlayer.pause()
         setMedia(MediaData.getMediaData(libVLC,
-            playlistData.songs.value!![playlistData.index.value!!]
+            playlistData.songs[playlistData.index.value!!]
         ))
         play()
         _nowPlaylist.value = playlistData
